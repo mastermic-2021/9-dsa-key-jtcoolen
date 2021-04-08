@@ -5,3 +5,11 @@ check(s,dsa_pub) = {
   [g,q,X] = dsa_pub;
   lift( (g^h*X^r)^(1/s % q) ) % q == r;
 }
+
+
+signatures = readvec("input.txt");
+print(length(signatures));
+\\print(signatures[1]);
+lookup = Map();
+for(i = 1, #signatures, [h, r, s] = signatures[i]; if(mapisdefined(lookup, r, &j), print(r)); mapput(lookup, r, signatures[i]));
+\\print(check(signatures[2], dsa_pub));
