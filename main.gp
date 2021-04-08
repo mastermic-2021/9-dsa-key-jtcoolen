@@ -3,6 +3,7 @@ check(s,dsa_pub) = {
   my(h,r,g,q,X);
   [h,r,s] = s;
   [g,q,X] = dsa_pub;
+  X = Mod(X, g.mod);
   lift( (g^h*X^r)^(1/s % q) ) % q == r;
 }
 
@@ -10,6 +11,12 @@ check(s,dsa_pub) = {
 signatures = readvec("input.txt");
 print(length(signatures));
 \\print(signatures[1]);
-lookup = Map();
-for(i = 1, #signatures, [h, r, s] = signatures[i]; if(mapisdefined(lookup, r, &j), print(r)); mapput(lookup, r, signatures[i]));
+\\lookup = Map();
+\\for(i = 1, #signatures, [h, r, s] = signatures[i]; if(mapisdefined(lookup, r, &j), print(r)); mapput(lookup, r, signatures[i]));
 \\print(check(signatures[2], dsa_pub));
+s1 = signatures[1];
+s2 = signatures[2];
+s3 = signatures[3];
+print(check(s3, dsa_pub));
+
+
