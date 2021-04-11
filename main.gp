@@ -22,7 +22,8 @@ lookup = Map();
 for(i=1, #sigs, [h, r, s] = sigs[i]; mapput(lookup, r, sigs[i])); 
 
 \\ On sait que k appartient à un intervalle plus petit que [1,q-1], permettant une attaque par force brute
-\\ On va élever g à un entier k choisi aléatoirement dans l'intervalle [0,10^10] jusqu'à ce qu'une collision (g^k mod p) mod q ait lieu.
+\\ On va élever g à un entier k choisi aléatoirement dans l'intervalle [1,10^10] jusqu'à ce qu'une collision (g^k mod p) mod q == r_i pour un certain i ait lieu.
+\\ En effet, l'entier r d'une signature DSA est donné par (g^k mod p) mod q pour un k aléatoire de l'intervalle ici [1,10^10].
 while(1, k=random(10^10); res=lift(Mod(lift(g^k), q)); if(mapisdefined(lookup, res, &j), break));
 
 \\ extraction de la clé privée
