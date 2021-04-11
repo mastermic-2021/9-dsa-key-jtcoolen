@@ -7,15 +7,23 @@ check(s,dsa_pub) = {
   lift( (g^h*X^r)^(1/s % q) ) % q == r;
 }
 
-signatures = readvec("input.txt");
-print(length(signatures));
-\\print(signatures[1]);
+\\ mod q: s=k^(-1) ( h(m) + x*r) => x = (k*s - h(m)) * r^(-1)
+extract_key(sig, k) = {
+  [h,r,s] = sig;
+  \\print(h, r, s);
+  lift( ( (k * s - h) * (1/Mod(r, q)) ) ) % q;
+}
+
+sigs = readvec("input.txt");
+[g,q,X] = dsa_pub;
 lookup = Map();
-for(i = 1, #signatures, [h, r, s] = signatures[i]; if(mapisdefined(lookup, r, &j), print(r)); mapput(lookup, r, signatures[i]));
-for (i = 1, #signatures, print(check(signatures[i], dsa_pub)));
-s1 = signatures[1];
-s2 = signatures[2];
-s3 = signatures[3];
-print(check(s3, dsa_pub));
 
+\\ Insertion des r_i
+for(i=1, #sigs, [h, r, s] = sigs[i]; mapput(lookup, r, sigs[i])); 
 
+\\ On sait que k appartient à un intervalle plus petit que [1,q-1], permettant une attaque par force brute
+\\ On va élever g à un entier k choisi aléatoirement dans l'intervalle [0,10^10] jusqu'à ce qu'une collision (g^k mod p) mod q ait lieu.
+while(1, k=random(10^10); res=lift(Mod(lift(g^k), q)); if(mapisdefined(lookup, res, &j), break));
+
+\\ extraction de la clé privée
+print(extract_key(j, k));
