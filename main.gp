@@ -10,8 +10,7 @@ check(s,dsa_pub) = {
 \\ mod q: s=k^(-1) ( h(m) + x*r) => x = (k*s - h(m)) * r^(-1)
 extract_key(sig, k) = {
   [h,r,s] = sig;
-  \\print(h, r, s);
-  lift( ( (k * s - h) * (1/Mod(r, q)) ) ) % q;
+  lift((k * s - h) * (1/Mod(r, q))) % q;
 }
 
 sigs = readvec("input.txt");
@@ -21,10 +20,13 @@ lookup = Map();
 \\ Insertion des r_i
 for(i=1, #sigs, [h, r, s] = sigs[i]; mapput(lookup, r, sigs[i])); 
 
-\\ On sait que k appartient à un intervalle plus petit que [1,q-1], permettant une attaque par force brute
-\\ On va élever g à un entier k choisi aléatoirement dans l'intervalle [1,10^10] jusqu'à ce qu'une collision (g^k mod p) mod q == r_i pour un certain i ait lieu.
-\\ En effet, l'entier r d'une signature DSA est donné par (g^k mod p) mod q pour un k aléatoire de l'intervalle ici [1,10^10].
-while(1, k=random(10^10); res=lift(Mod(lift(g^k), q)); if(mapisdefined(lookup, res, &j), break));
+/* Comme l'indique un commit précédent, l'attaque par collision sur les r_i ne fonctionne pas car aucune collision n'est trouvée.
+ * On sait que k appartient à un intervalle plus petit que [1,q-1], permettant une attaque par force brute
+ * On va élever g à un entier k choisi aléatoirement dans l'intervalle [1,10^10] jusqu'à ce qu'une collision
+ * (g^k mod p) mod q == r_i pour un certain i ait lieu.
+ * En effet, l'entier r d'une signature DSA est donné par (g^k mod p) mod q pour un k aléatoire de l'intervalle ici [1,10^10].
+ */
+while(1, k=random(10^10); res=lift(Mod(lift(g^k), q)); if(mapisdefined(lookup, res, &sig), break));
 
 \\ extraction de la clé privée
-print(extract_key(j, k));
+print(extract_key(sig, k));
